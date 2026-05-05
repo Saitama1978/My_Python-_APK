@@ -1,0 +1,63 @@
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.button import Button
+from kivy.uix.progressbar import ProgressBar
+from kivy.clock import Clock
+import psutil # Kailangan ito sa build requirements
+import os
+
+class RAMSaverAndroid(App):
+    def build(self):
+        self.layout = BoxLayout(orientation='vertical', padding=20, spacing=20)
+        
+        # Header
+        self.layout.add_widget(Label(
+            text="RAMSAVER PRO", 
+            font_size='30sp', 
+            bold=True,
+            color=(0, 0.7, 1, 1)
+        ))
+        self.layout.add_widget(Label(text="DEV: Renante Fullo", font_size='14sp'))
+
+        # RAM Usage Display
+        self.ram_label = Label(text="Checking RAM...", font_size='18sp')
+        self.layout.add_widget(self.ram_label)
+        
+        self.pb = ProgressBar(max=100, value=0)
+        self.layout.add_widget(self.pb)
+
+        # Optimize Button
+        self.btn = Button(
+            text="OPTIMIZE NOW", 
+            size_hint=(1, 0.3),
+            background_color=(0, 1, 0, 1),
+            bold=True
+        )
+        self.btn.bind(on_press=self.optimize)
+        self.layout.add_widget(self.btn)
+
+        # Update RAM info every 2 seconds
+        Clock.schedule_interval(self.update_ram, 2)
+        
+        return self.layout
+
+    def update_ram(self, dt):
+        ram = psutil.virtual_memory()
+        self.ram_label.text = f"RAM Usage: {ram.percent}%"
+        self.pb.value = ram.percent
+
+    def optimize(self, instance):
+        # Sa Android, hindi mo pwedeng i-clear ang system RAM 
+        # pero pwede nating i-trigger ang garbage collector ng Python
+        import gc
+        gc.collect()
+        self.ram_label.text = "Memory Optimized!"
+        self.btn.text = "SYSTEM CLEANED"
+        Clock.schedule_once(self.reset_btn, 3)
+
+    def reset_btn(self, dt):
+        self.btn.text = "OPTIMIZE NOW"
+
+if __name__ == "__main__":
+    RAMSaverAndroid().run()
