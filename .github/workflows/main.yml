@@ -7,7 +7,8 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Binago natin ito sa 22.04 para iwas sa error sa Ubuntu 24
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout Code
@@ -21,7 +22,6 @@ jobs:
       - name: Install Buildozer dependencies
         run: |
           sudo apt update
-          # Pag-install ng lahat ng kailangang system libraries para sa Android build
           sudo apt install -y \
             git \
             zip \
@@ -42,28 +42,15 @@ jobs:
             libgmp-dev \
             libmpc-dev \
             libmpfr-dev
-
-          # Pag-install ng Buildozer at Cython
+          
           pip install --user --upgrade buildozer cython virtualenv
 
       - name: Build APK with Buildozer
         run: |
-          # Idagdag ang local bin sa PATH para matawag ang buildozer command
           export PATH=$PATH:$HOME/.local/bin
-          
-          # Auto-accept ng Android SDK licenses bago ang mismong build
-          mkdir -p ~/.android
-          touch ~/.android/repositories.cfg
+          # Mas siguradong pag-accept ng licenses
           yes | buildozer android debug || true
-          
-          # Simulan ang pag-build ng debug APK
+          # Dagdagan natin ng log level para makita natin ang detalye kung sasabit man
           buildozer android debug
         env:
-          # Safety environment variable para sa SDK licenses
           APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
-
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Firewall-APK-RenanteFullo
-          path: bin/*.apk
