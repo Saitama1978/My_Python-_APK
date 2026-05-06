@@ -7,20 +7,13 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04 # Mas stable na version para sa Buildozer
+    runs-on: ubuntu-latest # Ibalik natin sa latest para mas mabilis mahanap ang action
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Build with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1.6.1 # Gumamit tayo ng specific version
+        uses: ArtemSBulgakov/buildozer-action@v1 # Ito ang tamang version tag
         with:
           buildozer_version: stable
           command: buildozer android debug
-          # Inalis natin ang python_version dito dahil nagbibigay ito ng warning kanina
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-apk-output
-          path: bin/*.apk
