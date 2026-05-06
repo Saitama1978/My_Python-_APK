@@ -1,6 +1,65 @@
-- name: Install Buildozer dependencies
+name: Build APK Manual
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Buildozer dependencies
         run: |
           sudo apt update
-          # Inalis natin ang libtinfo5 at pinalitan ng libtinfo6/dev tools
-          sudo apt install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libffi-dev libssl-dev cmake
+          # Ginamit natin ang mga compatible packages para sa ubuntu-latest
+          sudo apt install -y \
+            git \
+            zip \
+            unzip \
+            openjdk-17-jdk \
+            python3-pip \
+            autoconf \
+            libtool \
+            pkg-config \
+            zlib1g-dev \
+            libncurses5-dev \
+            libncursesw5-dev \
+            libffi-dev \
+            libssl-dev \
+            cmake \
+            gettext \
+            libltdl-dev \
+            libgmp-dev \
+            libmpc-dev \
+            libmpfr-dev
+          
+          # Install buildozer at cython
           pip install --user --upgrade buildozer cython virtualenv
+
+      - name: Build APK with Buildozer
+        run: |
+          # Idagdag ang local bin sa PATH para matawag ang buildozer command
+          export PATH=$PATH:$HOME/.local/bin
+          
+          # Siguraduhin na ang buildozer ay tatakbo nang walang hininging input
+          # Ang 'yes' command ay para i-accept lahat ng Android SDK licenses
+          yes | buildozer android debug
+        env:
+          # Karagdagang safety para sa SDK licenses
+          APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: maritime-app-output
+          path: bin/*.apk
