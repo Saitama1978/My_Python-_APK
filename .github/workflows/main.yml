@@ -80,21 +80,18 @@ jobs:
 
       - name: Build APK with Buildozer
         run: |
-          # Linisin ang mga lumang failed builds
+          # Inalis natin ang 'buildozer android clean' para iwas sa FileNotFoundError
+          # Gagamit tayo ng simple 'rm' command kung gusto nating linisin ang workspace
           rm -rf .buildozer
           
-          # Auto-accept Android SDK licenses
-          yes | buildozer android clean
-          
-          # Simulan ang build na may verbose logs
+          # Simulan ang build na may full logs
           buildozer -v android debug
         env:
-          # Para iwas sa Node.js deprecation warning
           FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
       - name: Upload APK Artifact
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: My-App-APK
+          name: RAMSaver-Firewall-APK
           path: bin/*.apk
