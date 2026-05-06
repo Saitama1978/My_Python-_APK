@@ -1,3 +1,31 @@
+name: Build APK Ultimate
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
       - name: Install System Dependencies
         run: |
           sudo apt update
@@ -42,3 +70,31 @@
             ant \
             zip \
             unzip
+
+      - name: Install Buildozer and Cython
+        run: |
+          pip install --upgrade pip
+          pip install --upgrade "Cython<3.0"
+          pip install buildozer
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Build APK with Buildozer
+        run: |
+          # Linisin ang mga lumang failed builds
+          rm -rf .buildozer
+          
+          # Auto-accept Android SDK licenses
+          yes | buildozer android clean
+          
+          # Simulan ang build na may verbose logs
+          buildozer -v android debug
+        env:
+          # Para iwas sa Node.js deprecation warning
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+      - name: Upload APK Artifact
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: My-App-APK
+          path: bin/*.apk
