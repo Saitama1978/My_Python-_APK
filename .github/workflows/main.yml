@@ -1,4 +1,4 @@
-name: Build Firewall APK
+name: Build RAMSaver APK
 
 on:
   push:
@@ -7,14 +7,14 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04 # Mas stable na version para sa Buildozer
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4 # Updated version
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v5 # Updated version
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
@@ -27,28 +27,16 @@ jobs:
       - name: Build APK with Buildozer
         run: |
           export PATH=$PATH:$HOME/.local/bin
-          # Auto-accept ng licenses
+          buildozer android clean
           yes | buildozer android debug || true
           buildozer android debug
         env:
           APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
-          # Pinipilit natin ang Node version para sa compatibility
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true" 
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Firewall-APK-Final
+          name: RAMSaver-APK-Final
           path: bin/*.apk
-          - name: Build APK with Buildozer
-        run: |
-          export PATH=$PATH:$HOME/.local/bin
-          # Siguraduhin natin na malinis ang build environment bago mag-umpisa
-          buildozer android clean
-          # Force accept licenses at simulan ang build
-          yes | buildozer android debug || true
-          buildozer android debug
-        env:
-          APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
-          # Dagdag na setting para sa Gradle at Ant compatibility
-          GRADLE_OPTS: "-Dorg.gradle.daemon=false"
