@@ -1,94 +1,21 @@
 [app]
-
-# (str) Title of your application
-title = RAMSaver
-
-# (str) Package name
-package.name = ramsaver
-
-# (str) Package domain (important)
-package.domain = org.renantefullo
-
-# (str) Source code where the main.py live
+title = RAMSaver Pro
+package.name = ramsaverpro
+package.domain = org.renante
 source.dir = .
-
-# (list) Source files to include
 source.include_exts = py,png,jpg,kv,atlas
+version = 0.1
+requirements = python3,kivy,psutil
 
-# (list) Application requirements
-requirements = python3,kivy
-
-# (str) Application version
-version = 1.0
-
-# (str) Orientation
 orientation = portrait
-
-# (bool) Fullscreen
 fullscreen = 0
+android.archs = arm64-v8a
 
+# (Opsyonal) Icon at Presplash - palitan kung may file ka na
+# icon.filename = %(source.dir)s/icon.png
+# presplash.filename = %(source.dir)s/presplash.png
 
-# ==============================
-# ANDROID CONFIG (IMPORTANT)
-# ==============================
-
-[buildozer]
-
-# (int) Log level (0 = error only, 2 = full debug)
-log_level = 2
-
-# (int) Warn on deprecated
-warn_on_root = 1
-
-
-[app:android]
-
-# ✅ STABLE SETTINGS (fix sa error mo)
-android.api = 31
+android.api = 33
 android.minapi = 21
-android.ndk = 25b
-
-# Architecture
-android.archs = arm64-v8a, armeabi-v7a
-
-# Permissions (optional dagdagan kung need mo)
-android.permissions = INTERNET
-
-# Android entry point
-android.entrypoint = org.kivy.android.PythonActivity
-
-# Use SDL2 (default)
-android.bootstrap = sdl2
-
-# (optional) Icon
-#icon.filename = %(source.dir)s/icon.png
-
-# (optional) Splash
-#presplash.filename = %(source.dir)s/presplash.png
-
-
-# ==============================
-# PYTHON-FOR-ANDROID FIX
-# ==============================
-
-# 🔥 IMPORTANT (fix sa gradlew failure)
-p4a.branch = stable
-
-
-# ==============================
-# BUILD OPTIONS
-# ==============================
-
-# Copy libs instead of symlink
-copy_libs = 1
-
-# Use local recipes if needed
-#p4a.local_recipes = ./recipes
-
-
-# ==============================
-# DEBUGGING
-# ==============================
-
-# Enable verbose logs
+android.accept_sdk_license = True
 log_level = 2
