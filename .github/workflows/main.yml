@@ -1,4 +1,4 @@
-name: Build APK Manual
+name: Build Firewall APK
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
       - name: Install Buildozer dependencies
         run: |
           sudo apt update
-          # Ginamit natin ang mga compatible packages para sa ubuntu-latest
+          # Pag-install ng lahat ng kailangang system libraries para sa Android build
           sudo apt install -y \
             git \
             zip \
@@ -42,8 +42,8 @@ jobs:
             libgmp-dev \
             libmpc-dev \
             libmpfr-dev
-          
-          # Install buildozer at cython
+
+          # Pag-install ng Buildozer at Cython
           pip install --user --upgrade buildozer cython virtualenv
 
       - name: Build APK with Buildozer
@@ -51,15 +51,19 @@ jobs:
           # Idagdag ang local bin sa PATH para matawag ang buildozer command
           export PATH=$PATH:$HOME/.local/bin
           
-          # Siguraduhin na ang buildozer ay tatakbo nang walang hininging input
-          # Ang 'yes' command ay para i-accept lahat ng Android SDK licenses
-          yes | buildozer android debug
+          # Auto-accept ng Android SDK licenses bago ang mismong build
+          mkdir -p ~/.android
+          touch ~/.android/repositories.cfg
+          yes | buildozer android debug || true
+          
+          # Simulan ang pag-build ng debug APK
+          buildozer android debug
         env:
-          # Karagdagang safety para sa SDK licenses
+          # Safety environment variable para sa SDK licenses
           APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: maritime-app-output
+          name: Firewall-APK-RenanteFullo
           path: bin/*.apk
