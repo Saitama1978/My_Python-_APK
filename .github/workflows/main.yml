@@ -26,7 +26,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Install Dependencies
+      - name: Install System Dependencies
         run: |
           sudo apt update
           sudo apt install -y \
@@ -67,28 +67,35 @@ jobs:
             automake \
             libtool \
             cmake \
-            ant
+            ant \
+            zip \
+            unzip
 
       - name: Install Buildozer and Cython
         run: |
           pip install --upgrade pip
           pip install --upgrade "Cython<3.0"
           pip install buildozer
-          # Siguraduhin na ang Buildozer ay nasa PATH
+          # Siguraduhin na ang path ay tama
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Build APK with Buildozer
         run: |
-          # Tinatanggal ang luma para iwas error sa Gradle
+          # Linisin ang mga lumang failed builds para iwas conflict
           rm -rf .buildozer
-          # Ang -v ay para makita natin ang eksaktong error kung sakaling pumalya ulit
+          
+          # Auto-accept Android SDK licenses (importante para sa Gradle)
+          yes | buildozer android clean
+          
+          # Simulan ang build na may full logs (-v)
           buildozer -v android debug
         env:
-          # Force Node 24 support para sa mga bagong runners
+          # Iniiwasan ang Node.js deprecation warning na nakita sa log mo
           FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
       - name: Upload APK Artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: My-Python-App
+          name: ChoyVlog-APK
           path: bin/*.apk
